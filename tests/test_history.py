@@ -72,3 +72,14 @@ def test_history_loads_existing_games(tmp_path):
 
     assert new_history.total_games == 2
     assert new_history.total_wins == 1
+
+def test_record_game_appends_jsonl(tmp_path):
+    history_file = tmp_path / "history.jsonl"
+
+    history = GameHistory(history_file)
+    history.record_game(True, 3, "apple")
+    history.record_game(False, 6, "house")
+
+    lines = history_file.read_text().splitlines()
+
+    assert len(lines) == 2

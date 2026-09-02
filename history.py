@@ -5,27 +5,31 @@ from pathlib import Path
 class GameHistory:
     """Store completed Wordle games and calculate player statistics."""
 
-    def __init__(self, path: str = "history.json") -> None:
+    def __init__(self, path: str = "history.jsonl") -> None:
         self.path = Path(path)
         self.games = []
         self.load()
 
     def load(self) -> None:
-        """Load game history from the JSON file."""
+        """Load game history from the JSONL file."""
         if not self.path.exists():
             self.games = []
             return
+       
+        with self.path.open("r", encoding="utf-8") as history_file:
+            self.games = [
+                json.loads(line)
+                for line in history_file
+                if line.strip()
+            ]
 
-        self.games = json.loads(
-            self.path.read_text(encoding="utf-8")
-        )
+    def save(self, game: dict) -> None:
+        """append game to the history JSON file."""
 
-    def save(self) -> None:
-        """Save game history to the JSON file."""
-        self.path.write_text(
-            json.dumps(self.games, indent=2),
-            encoding="utf-8",
-        )
+        with self.path.open("a") as history_file:
+            history_file.write(
+                json.dumps(game) + "\n"
+            )
 
     def record_game(
         self,
@@ -34,14 +38,14 @@ class GameHistory:
         word: str,
     ) -> None:
         """Record a completed game and save the history."""
-
-        self.games.append({
+        game = {
             "won": won,
             "attempts": attempts,
             "word": word,
-        })
+        }
 
-        self.save()
+        self.games.append(game)
+        self.save(game)
 
     @property
     def total_games(self) -> int:

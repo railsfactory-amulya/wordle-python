@@ -3,5 +3,5 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .ruff_cache/
-history.json
+history.jsonl
 .DS_Store
